@@ -2,7 +2,6 @@ import { createContext, useContext, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
 import axios from 'axios';
-import { dummyProducts } from '../assets/assets';  // 👈 add this
 
 axios.defaults.baseURL = import.meta.env.VITE_BACKEND_URL;
 axios.defaults.withCredentials = true; 
@@ -21,18 +20,17 @@ export const AppContextProvider = ({ children }) => {
   const [searchQuery, setSearchQuery] = useState({})
 
   const fetchUser = async () => {
-  try {
-    const { data } = await axios.get('/api/user/is-auth', { withCredentials: true });
-    if (data.success) {
-      setUser(data.user)
-      // Cart items validate karo - sirf valid items set karo
-      setCartItems({})  // Pehle clear karo
+    try {
+      const { data } = await axios.get('/api/user/is-auth', { withCredentials: true });
+      if (data.success) {
+        setUser(data.user)
+        setCartItems(data.user.cartItems)
+      }
+    } catch (error) {
+      console.log(error)
+      setUser(null)
     }
-  } catch (error) {
-    console.log(error)
-    setUser(null)
   }
-}
 
   const fetchSeller = async () => {
     try {
@@ -48,18 +46,16 @@ export const AppContextProvider = ({ children }) => {
     }
   };
 
- const fetchProducts = async () => {
-  try {
-    const { data } = await axios.get('/api/product/list')
-    if (data.success && data.products && data.products.length > 0) {
-      setProducts([...data.products, ...dummyProducts])  // merge both
-    } else {
-      setProducts(dummyProducts)
+  const fetchProducts = async () => {
+    try {
+      const { data } = await axios.get('/api/product/list')
+      if (data.success) {
+        setProducts(data.products)
+      }
+    } catch (error) {
+      toast.error("Failed to load products")
     }
-  } catch (error) {
-    setProducts(dummyProducts)
   }
-}
 
   const addToCart = (itemId) => {
     let cartData = structuredClone(cartItems);
