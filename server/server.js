@@ -25,7 +25,8 @@ await connectCloudinary();
 // CORS config for frontend origins
 const allowedOrigins = [
   "http://localhost:5173",
-    "http://localhost:5174",
+  "http://localhost:5174",
+  "https://grocery-app-frontend-ten.vercel.app",
   "https://grocery-app-frontend-gfi0syvi9-roha-attas-projects.vercel.app",
 ];
 
