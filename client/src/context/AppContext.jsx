@@ -21,17 +21,21 @@ export const AppContextProvider = ({ children }) => {
   const [searchQuery, setSearchQuery] = useState({})
 
   const fetchUser = async () => {
-    try {
-      const { data } = await axios.get('/api/user/is-auth', { withCredentials: true });
-      if (data.success) {
-        setUser(data.user)
-        setCartItems(data.user.cartItems)
+  try {
+    const { data } = await axios.get('/api/user/is-auth', { withCredentials: true });
+    if (data.success) {
+      setUser(data.user)
+      setCartItems(data.user.cartItems)
+      if (data.token) {
+        localStorage.setItem('token', data.token);
+        axios.defaults.headers.common['Authorization'] = `Bearer ${data.token}`;
       }
-    } catch (error) {
-      console.log(error)
-      setUser(null)
     }
+  } catch (error) {
+    console.log(error)
+    setUser(null)
   }
+}
 
   const fetchSeller = async () => {
     try {
@@ -106,12 +110,15 @@ export const AppContextProvider = ({ children }) => {
     }
     return Math.floor(totalAmount * 100) / 100;
   }
-
-  useEffect(() => {
-    fetchUser()
-    fetchSeller()
-    fetchProducts()
-  }, [])
+useEffect(() => {
+  const token = localStorage.getItem('token');
+  if (token) {
+    axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+  }
+  fetchUser();
+  fetchSeller();
+  fetchProducts();
+}, []);
 
   useEffect(() => {
     const updateCart = async () => {

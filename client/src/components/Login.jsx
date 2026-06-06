@@ -20,10 +20,15 @@ const Login = () => {
      
     );
         if(data.success){
-            navigate('/')
-            setUser(data.user)
-            setShowUserLogin(false)
-        }else{
+    navigate('/')
+    setUser(data.user)
+    setShowUserLogin(false)
+    // token save karo
+    if(data.token){
+        localStorage.setItem('token', data.token);
+        axios.defaults.headers.common['Authorization'] = `Bearer ${data.token}`;
+    }
+}else{
             toast.error(data.message)
 
         }
